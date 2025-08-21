@@ -16,6 +16,7 @@ import {
     Sun
 } from "lucide-react";
 import Image from "next/image";
+import sleep from "@/app/helper/sleep";
 
 export default function SosialpediaAuthPage() {
     const [mode, setMode] = useState<"login" | "signup">("login");
@@ -31,6 +32,11 @@ export default function SosialpediaAuthPage() {
     const [acceptTos, setAcceptTos] = useState(false);
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+
+
     useEffect(() => {
         if (typeof window === 'undefined') return;
         const stored = localStorage.getItem('theme');
@@ -45,17 +51,8 @@ export default function SosialpediaAuthPage() {
         localStorage.setItem('theme', theme);
         document.documentElement.classList.toggle('dark', theme === 'dark');
     }, [theme]);
-    const [rememberMe, setRememberMe] = useState(true);
 
-    function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        if (mode === "login") {
-            console.log({emailOrUsername, password, rememberMe});
-        } else {
-            console.log({username, email, password, password2, acceptTos});
-        }
-        alert(`${mode === "login" ? "Login" : "Signup"} submitted — lihat console untuk payload demo.`);
-    }
+    const [rememberMe, setRememberMe] = useState(true);
 
     const pwStrength = useMemo(() => {
         const len = password.length;
@@ -64,6 +61,65 @@ export default function SosialpediaAuthPage() {
         if (len < 10) return {label: "sedang", width: "66%"};
         return {label: "kuat", width: "100%"};
     }, [password]);
+
+    const passwordMin = 8;
+
+    const confirmMismatch =
+        mode === "signup" && password2.length > 0 && password !== password2;
+
+    const weakPassword =
+        mode === "signup" && password.length > 0 && password.length < passwordMin;
+
+    const canSubmit =
+        mode === "signup"
+            ? Boolean(username && email && password && password2 && acceptTos) &&
+            !confirmMismatch &&
+            !weakPassword &&
+            !loading
+            : Boolean(emailOrUsername && password) && !loading;
+
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+
+        if (mode === "login") {
+            // TODO: implement login nanti
+            console.log({ emailOrUsername, password, rememberMe });
+            return;
+        }
+
+        // mode === "signup"
+        try {
+            setError(null);
+            setSuccess(null);
+
+            // Validasi client-side cepat
+            if (password.length < passwordMin) {
+                throw new Error(`Password minimal ${passwordMin} karakter`);
+            }
+            if (password !== password2) {
+                throw new Error("Konfirmasi password tidak sama");
+            }
+
+            setLoading(true);
+            const r = await fetch("/api/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, email, password }),
+            });
+
+            const data = await r.json().catch(() => ({}));
+            if (!r.ok) throw new Error(data?.error || "Signup gagal");
+
+            setSuccess("Signup berhasil! Silakan cek email/lanjut login.");
+            setEmailOrUsername(username);
+            await sleep(1500);
+            setMode("login");
+        } catch (err: any) {
+            setError(err?.message || "Terjadi kesalahan");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <main data-theme={theme}
@@ -207,11 +263,18 @@ export default function SosialpediaAuthPage() {
                     </span>
                                     </label>
 
+                                    {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
+                                    {success && <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-400">{success}</p>}
                                     <button
                                         type="submit"
-                                        className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-3 font-medium hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-300 active:scale-[.99] dark:bg-white dark:text-slate-900 dark:hover:bg-white/90 dark:focus:ring-white/30"
+                                        disabled={!canSubmit}
+                                        className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl
+             bg-slate-900 text-white px-4 py-3 font-medium hover:bg-slate-800
+             focus:outline-none focus:ring-2 focus:ring-slate-300 active:scale-[.99]
+             disabled:opacity-60 disabled:cursor-not-allowed
+             dark:bg-white dark:text-slate-900 dark:hover:bg-white/90 dark:focus:ring-white/30"
                                     >
-                                        <CheckCircle2 className="h-5 w-5"/> Buat Akun
+                                        {loading ? "Memproses..." : (<><CheckCircle2 className="h-5 w-5" /> Buat Akun</>)}
                                     </button>
                                 </>
                             ) : (
