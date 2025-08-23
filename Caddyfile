@@ -1,4 +1,4 @@
-sosialpedia.mareno.my.id {
+samaran.id {
   encode zstd gzip
   reverse_proxy app:3000
 }

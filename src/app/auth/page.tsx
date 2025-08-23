@@ -18,7 +18,7 @@ import {
 import Image from "next/image";
 import sleep from "@/app/helper/sleep";
 
-export default function SosialpediaAuthPage() {
+export default function SamaranAuthPage() {
     const [mode, setMode] = useState<"login" | "signup">("login");
     const [showPw, setShowPw] = useState(false);
     const [showPw2, setShowPw2] = useState(false);
@@ -132,8 +132,8 @@ export default function SosialpediaAuthPage() {
 
             <header className="px-6 md:px-10 py-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <Image src="icon.svg" alt="Sosialpedia logo" width={36} height={36} className="rounded-xl"/>
-                    <span className="font-bold text-xl tracking-wide">Sosialpedia</span>
+                    <Image src="icon.svg" alt="Samaran logo" width={36} height={36} className="rounded-xl"/>
+                    <span className="font-bold text-xl tracking-wide">Samaran</span>
                     <span
                         className="ml-2 rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 px-2 py-0.5 text-xs text-slate-700 dark:text-white/80">beta</span>
                 </div>
@@ -162,7 +162,7 @@ export default function SosialpediaAuthPage() {
                         className="rounded-2xl bg-white dark:bg-white/5 backdrop-blur-xl shadow-2xl ring-1 ring-slate-200/60 dark:ring-white/10 p-6 sm:p-8">
                         <div className="flex items-center justify-between">
                             <h1 className="text-2xl font-semibold">
-                                {mode === "login" ? "Masuk ke Sosialpedia" : "Buat akun Sosialpedia"}
+                                {mode === "login" ? "Masuk ke Samaran" : "Buat akun Samaran"}
                             </h1>
                             <div
                                 className="flex items-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-1 text-xs">
@@ -417,7 +417,7 @@ export default function SosialpediaAuthPage() {
 
             <footer className="mx-auto mt-10 max-w-6xl px-6 md:px-10 pb-10">
                 <p className="text-center text-xs text-slate-500 dark:text-white/50">
-                    © {new Date().getFullYear()} Sosialpedia • Dibuat dengan ❤ untuk komunitas
+                    © {new Date().getFullYear()} Samaran • Dibuat dengan ❤ untuk komunitas
                 </p>
             </footer>
         </main>

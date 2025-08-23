@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sosialpedia",
+  title: "Samaran",
   description: "Anonymous Social Media",
     icons: [
         {
